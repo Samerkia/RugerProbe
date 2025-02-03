@@ -12,7 +12,7 @@ I am currently designing and picking the hardware to use/designing the code behi
 
 
 ## RugerProbe Prototype (2/2/2025)
-Here is an image of where it is currently at. It reads Light levels, temperature, and humidity. There are LED indicator lights that show if everything is working.
+Here is an image of where it is currently at. It reads Light levels, temperature, and humidity. There are LED indicator lights that show if everything is working. The picture makes it hard to see but the RED LED = Photoresistor and the YELLOW LED = DHT11 module. I plan to add more per each module I add to this probe
 
 ![ProtoType1](https://github.com/user-attachments/assets/9ea3d890-8a68-4ae9-9713-37ff85346912)
 
