@@ -1,0 +1,32 @@
+# Ignore the build and dependency folders for Node.js (frontend)
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.env
+
+# Ignore the build and dependency folders for .NET (backend)
+backend/bin/
+backend/obj/
+backend/.vs/
+backend/*.user
+backend/*.userosscache
+backend/*.suo
+backend/*.userprefs
+
+# Ignore IDE settings (e.g., Visual Studio, VSCode)
+.vscode/
+.idea/
+
+# Ignore OS-specific files
+.DS_Store  # macOS
+Thumbs.db  # Windows
+
+# Ignore logs, temp, and cache files
+*.log
+*.tmp
+*.swp
+*.bak
+
+# Ignore global configuration files (like Yarn or NPM lockfiles for frontend if you use other package managers)
+frontend/package-lock.json
+frontend/yarn.lock
