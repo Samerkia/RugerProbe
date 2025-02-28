@@ -52,10 +52,9 @@ void loop() {
 
 void printSensorData(float t, float h, int l) {
   // Print sensor values
-  Serial.print("Temperature: "); Serial.print(t); Serial.println(" °F");
-  Serial.print("Humidity: "); Serial.print(h); Serial.println(" %");
-  Serial.print("Light Level: "); Serial.print(l); Serial.println(" lux");
-  Serial.println("----------------------------------------");
+  Serial.print("t "); Serial.print(t); Serial.println(" F");
+  Serial.print("h "); Serial.print(h); Serial.println(" %");
+  Serial.print("l "); Serial.print(l); Serial.println(" lux");
 }
 
 void blinkError(String comp) {
