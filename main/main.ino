@@ -21,9 +21,10 @@ DHT dht(DHTPIN, DHTTYPE);
 void setup() {
   // put your setup code here, to run once:
   pinMode(PHOTORESISTOR_PIN, INPUT); // Analog
-
   pinMode(LIGHT_SENSOR_LED_IND, OUTPUT); // indicator output
   pinMode(DHT_LED_IND, OUTPUT); // indicator output
+  pinMode(SONIC_PIN, OUTPUT); // Set SONIC_PIN as OUTPUT for triggering ultrasonic sensor
+  pinMode(ECHO_PIN, INPUT); // Set ECHO_PIN as INPUT for receiving echo signal
   
   dht.begin();
   Serial.begin(9600);
@@ -31,7 +32,8 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  int lightLevel = getLightLevels();  
+  int lightLevel = analogRead(PHOTORESISTOR_PIN);//getLightLevels();  
+  validateLightSensor(lightLevel);
   float temp, humidity;
   getTempData(temp, humidity);
   float dist = getSonar();
@@ -43,31 +45,60 @@ void loop() {
 unsigned long pulseIn(int pin, int level, int timeout) {
   unsigned long startTime = micros();
 
-  //wait for the pulse to start
-  while(digitalRead(pin) != level) {
-    if (micros() - startTime > timeout) return 0; // timeout
+   // Wait for the pulse to START
+  while (digitalRead(pin) != level) {
+    if (micros() - startTime > timeout) {
+      Serial.println("TIMEOUT waiting for pulse start");
+      return 0; // Timeout
+    }
   }
 
   unsigned long pulseStart = micros();
 
-  //wait for the pulse to start
-  while(digitalRead(pin) != level) {
-    if (micros() - startTime > timeout) return 0; // timeout
+  // Wait for the pulse to END
+  while (digitalRead(pin) == level) {
+    if (micros() - startTime > timeout) {
+      Serial.println("TIMEOUT waiting for pulse end");
+      return 0; // Timeout
+    }
   }
 
+  // Return the duration of the pulse in microseconds
   return micros() - pulseStart;
 }
 
-// gets the measurement result of the ultra sonic modulator in centimeters
 float getSonar() {
   long pingTime;
   float dist;
-  digitalWrite(SONIC_PIN, HIGH); 
-  delayMicroseconds(10);
+  
+  // Ensure the trigger pin is LOW before sending the pulse
+  digitalWrite(SONIC_PIN, LOW); 
+  delayMicroseconds(2);
+  
+  // Trigger the ultrasonic sensor
+  digitalWrite(SONIC_PIN, HIGH);
+  delayMicroseconds(10);  // Send a 10-microsecond pulse
   digitalWrite(SONIC_PIN, LOW);
-  pingTime = pulseIn(ECHO_PIN, HIGH, timeOut); // read the puls time of the echo pin
-  dist = (float)pingTime * 340.0 / 2.0 / 10000.0; // Calculate distance using speed of sound
+  
+  // Debug: Print the state of the ECHO_PIN to ensure it's working
+  Serial.print("Echo Pin State: ");
+  Serial.println(digitalRead(ECHO_PIN));
+  
+  // Measure the time it takes for the echo to return
+  pingTime = pulseIn(ECHO_PIN, HIGH, timeOut);
+  
+  // If no valid pulse time is returned, print a warning
+  if (pingTime == 0) {
+    Serial.println("No pulse received from ultrasonic sensor.");
+    return 0;  // Return 0 to indicate failure
+  }
+
+  // Calculate the distance based on the speed of sound
+  dist = (float)pingTime * 340.0 / 2.0 / 10000.0;  // Distance in cm
+  
+  return dist;
 }
+
 
 void getTempData(float &temp, float &humidity) {
   // Checks DHT11 module is working 
@@ -80,19 +111,16 @@ void getTempData(float &temp, float &humidity) {
   humidity = dht.readHumidity(); // Read humidity (%)
 }
 
-int getLightLevels() {
-    int lightLevel = analogRead(PHOTORESISTOR_PIN);
+void validateLightSensor(int l) {
 
     // Checks light levels and sets LED accordingly
-    if (lightLevel < 5) {
+    if (l < 5) {
       digitalWrite(LIGHT_SENSOR_LED_IND, LOW);
-    } else if (lightLevel > 5) { 
+    } else if (l > 5) { 
       digitalWrite(LIGHT_SENSOR_LED_IND, HIGH);
     } else {
       blinkError("PHOTORESISTOR");
     }
-
-    return lightLevel;
 }
 
 void printSensorData(float t, float h, int l, float d) {
