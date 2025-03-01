@@ -9,7 +9,7 @@ Current component list
 - temperature and humidity levels (DHT11) 
 - light levels (photoresistor [Might switch to TSL2562])
 - PIR Motion Sensor
-- Measure distance with Ultrasonic Ranging Module (HC-SR04) (I think mine is broken so this is on hold)
+- Measure distance with Ultrasonic Ranging Module (HC-SR04) ((3/1/25)I think mine is broken so this is on hold)
 
 Future updates
 - Implement the PIR Motion Sensor and Ultrasonic Ranging Module
