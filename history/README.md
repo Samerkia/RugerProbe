@@ -1,4 +1,5 @@
 # History of the project
+Started 1/31/25 - Ended WIP
 ## Data Collection Screens
 3/1/25 - The Front end now displays how far an object is and if motion is detected (not sure why the Photo resistor is at 1k lux, but I hope I didn't break that along with my ultrasonic ranger). I have plans to make this look better 
 
