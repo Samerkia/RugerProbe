@@ -30,3 +30,6 @@ Thumbs.db  # Windows
 # Ignore global configuration files (like Yarn or NPM lockfiles for frontend if you use other package managers)
 frontend/package-lock.json
 frontend/yarn.lock
+
+# Ignore sln files 
+*.sln

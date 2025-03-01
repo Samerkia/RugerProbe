@@ -55,9 +55,10 @@ class Backend {
         }
     }
 
-    static string temperature = null;
-    static string humidity = null;
-    static string lightLevel = null;
+    static string temperature = string.Empty;
+    static string humidity = string.Empty;
+    static string lightLevel = string.Empty;
+    static string distance = string.Empty;
 
     static async void SerialDataReceived(object sender, SerialDataReceivedEventArgs e) {
         try {
@@ -77,24 +78,28 @@ class Backend {
                 humidity = dataDict["h"];
             } else if (dataDict.ContainsKey("l")) {
                 lightLevel = dataDict["l"];
+            } else if (dataDict.ContainsKey("d")) {
+                distance = dataDict["d"];
             }
 
             // If all required data is present, send it together
-            if (temperature != null && humidity != null && lightLevel != null) {
+            if (temperature != string.Empty && humidity != string.Empty && lightLevel != string.Empty && distance != string.Empty) {
                 var fullData = new Dictionary<string, string>
                 {
                     { "t", temperature },
                     { "h", humidity },
-                    { "l", lightLevel }
+                    { "l", lightLevel },
+                    { "d", distance }
                 };
 
                 // Broadcast the complete data to WebSocket clients
                 await BroadcastToWebSocketClients(fullData);
 
                 // Reset values if you need to prepare for the next set of data
-                temperature = null;
-                humidity = null;
-                lightLevel = null;
+                temperature = string.Empty;
+                humidity = string.Empty;
+                lightLevel = string.Empty;
+                distance = string.Empty;
             }
 
         } catch (Exception ex) {

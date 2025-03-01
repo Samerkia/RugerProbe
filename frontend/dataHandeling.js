@@ -16,6 +16,7 @@ ws.onmessage = (event) => {
     document.getElementById("temperature").innerText = data["t"] || "N/A";
     document.getElementById("humidity").innerText = data["h"] || "N/A";
     document.getElementById("lightLevel").innerText = data["l"] || "N/A";
+    document.getElementById("distance").innerText = data["d"] || "N/A";
 };
 
 
