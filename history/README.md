@@ -1,3 +1,5 @@
+# History of the project
+# ----------------------------
 ## Data Collection Screens
 
 2/27/25 - C# dotnet to send to a JavaScript Electron App for easier viewing! (I have plans to make it look awesome at a later date) 
@@ -14,3 +16,4 @@
 2/2/25 Here is an image of where the physical component. It reads Light levels, temperature, and humidity. There are LED indicator lights that show if everything is working. The picture makes it hard to see but the RED LED = Photoresistor and the YELLOW LED = DHT11 module. I plan to add more per each module I add to this probe
 
 ![ProtoType1](https://github.com/user-attachments/assets/9ea3d890-8a68-4ae9-9713-37ff85346912)
+
