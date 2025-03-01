@@ -1,16 +1,39 @@
+# RugerProbe
+This is a probe device named after my dog, Ruger. It will read telemetry data and transmit it to a front end app with eventual wireless communication!
+
+Current component list
+- Arduino Uno (in the prototype phase, if built may use Arduino Nano 33)
+- temperature and humidity levels (DHT11) 
+- light levels (photoresistor [Might switch to TSL2562])
+- PIR Motion Sensor
+- Measure distance with Ultrasonic Ranging Module (HC-SR04)
+
+## Future updates
+Hardware
+- Implement a way to take pictures
+- Switch to Arduino Nano 33 then I can transmit data wirelessly
+- Design a custom PCB to use instead of a bread board
+- Implement a way to add in motors and wheels
+- If I add in motors and wheels, I will need to add in a way to read acceleration and a gyroscope (Attitude Sensor MPU6050)
+  
+Code
+- Code to make the Hardware goals work
+- Make the data collection app look awesome
+- Maybe a way to send data from front end to the arduino
+
+# Running the app
+- Have the Arduino run the main.ino code
+- Run the backend code `dotnet run .\serialDataHandler.cs`
+- Run the frontend code `npx electron .`
+- Eventually I will make it into one executable
+
+# Current Status <3/1/25>
 ## Data Collection Screens
+3/1/25 - Displays all data collected (Temperature, Humidity, Light Level, Distance an object is, and if Motion is detected or not)
 
-2/27/25 - C# dotnet to send to a JavaScript Electron App for easier viewing! (I have plans to make it look awesome at a later date) 
-
-![data2](https://github.com/user-attachments/assets/5b4819fd-e014-47bc-a6ec-f23cdb87e2ce)
-
-2/2/25 - Here is a screenshot of the data it collects at the moment, just printing to a console screen
-
-![Data1](https://github.com/user-attachments/assets/70875138-2e4b-4b8a-8d1e-ed0a5d3d8d71)
+![data3](https://github.com/user-attachments/assets/29eeeef2-a60f-410b-857b-86352fc1cd7a)
 
 ## Hardware
-3/1/25 - It now reads Light levels, temperature, humidity, detects motion, and how far something may be. LED Inidcator lights RED - Photoresistor, YELLOW - DHT11 module, BLUE - ultrasonic module, GREEN - Motion Detector
+3/1/25 - It now reads Light levels, temperature, humidity, detects motion, and how far something may be. LED indicator lights RED - Photoresistor, YELLOW - DHT11 module, BLUE - ultrasonic module, GREEN - Motion Detector
 
-2/2/25 Here is an image of where the physical component. It reads Light levels, temperature, and humidity. There are LED indicator lights that show if everything is working. The picture makes it hard to see but the RED LED = Photoresistor and the YELLOW LED = DHT11 module. I plan to add more per each module I add to this probe
-
-![ProtoType1](https://github.com/user-attachments/assets/9ea3d890-8a68-4ae9-9713-37ff85346912)
+![proto1](https://github.com/user-attachments/assets/f183d2c4-fa72-4a20-8dcc-1bb031027f62)
