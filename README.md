@@ -27,11 +27,12 @@ Code
 - Run the frontend code `npx electron .`
 - Eventually I will make it into one executable
 
-# Current Status <3/1/25>
+# Current Status <3/2/25>
 ## Data Collection Screens
-3/1/25 - Displays all data collected (Temperature, Humidity, Light Level, Distance an object is, and if Motion is detected or not)
+3/2/25 - Displays all data collected (Temperature, Humidity, Light Level, Distance an object is, and if Motion is detected or not), and it is now stylized! (I will keep updating as I see fit as well)
 
-![data3](https://github.com/user-attachments/assets/29eeeef2-a60f-410b-857b-86352fc1cd7a)
+![data4](https://github.com/user-attachments/assets/6c0bf008-d639-4f61-9d56-4cae582d360c)
+
 
 ## Hardware
 3/1/25 - It now reads Light levels, temperature, humidity, detects motion, and how far something may be. LED indicator lights RED - Photoresistor, YELLOW - DHT11 module, BLUE - ultrasonic module, GREEN - Motion Detector
