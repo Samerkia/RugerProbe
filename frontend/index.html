@@ -2,15 +2,45 @@
 <html>
 <head>
     <title>Ruger Probe Data</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h1>Live Serial Data:</h1>
-    <div>
-        <h3>Temperature: <span id="temperature">N/A</span></h3>
-        <h3>Humidity: <span id="humidity">N/A</span></h3>
-        <h3>Light Level: <span id="lightLevel">N/A</span></h3>
-        <h3>Distance: <span id="distance">N/A</span></h3>
-        <h3><span id="motion">N/A</span></h3>
+
+    <div class="dashboard">
+        <div class="top-container">
+            <div class="box" id="tempHumidity">
+                <div class="circle-container">
+                    <svg width="120" height="120" viewBox="0 0 100 100" class="circle-chart">
+                        <circle cx="50" cy="50" r="40" class="circle-bg"/>
+                        <circle cx="50" cy="50" r="40" class="temp-circle-progress" id="tempCircle"/>
+                    </svg>
+                    <div class="circle-text">
+                        <span id="temperature">N/A</span>
+                        <span id="humidity">N/A</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box" id="light">
+                <div class="circle-container">
+                    <svg width="120" height="120" viewBox="0 0 100 100" class="circle-chart">
+                        <circle cx="50" cy="50" r="40" class="circle-bg"/>
+                        <circle cx="50" cy="50" r="40" class="light-circle-progress" id="lightCircle"/>
+                    </svg>
+                    <div class="circle-text">
+                        <span id="lightLevel">N/A</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-container">
+            <div class="box" id="motionDistance">
+                <h3>Distance: <span id="distance">N/A</span></h3>
+                <h3><span id="motion">N/A</span></h3>
+            </div>
+        </div>
     </div>
 
     <script src="dataHandeling.js"></script>
