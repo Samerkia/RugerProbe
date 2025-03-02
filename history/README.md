@@ -1,6 +1,11 @@
 # History of the project
 Started 1/31/25 - Ended WIP
 ## Data Collection Screens
+3/2/25 - The front end was stylized to look a little cooler! I also fixed the light sensor... I forgot to ground it 
+
+![data4](https://github.com/user-attachments/assets/e4b7a866-9668-441c-9e49-77c8826c6edb)
+
+
 3/1/25 - The Front end now displays how far an object is and if motion is detected (not sure why the Photo resistor is at 1k lux, but I hope I didn't break that along with my ultrasonic ranger). I have plans to make this look better 
 
 ![data3](https://github.com/user-attachments/assets/e74eed54-48d7-4125-ac1c-85a473ef6240)
