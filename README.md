@@ -35,6 +35,7 @@ Code
 
 
 ## Hardware
-3/1/25 - It now reads Light levels, temperature, humidity, detects motion, and how far something may be. LED indicator lights RED - Photoresistor, YELLOW - DHT11 module, BLUE - ultrasonic module, GREEN - Motion Detector
+3/16/25 - Ardunio Nano and wireless power added.... working on a way to read BLE data but struggling to get code to connect... my phone can read it though 
 
-![proto1](https://github.com/user-attachments/assets/f183d2c4-fa72-4a20-8dcc-1bb031027f62)
+![proto3](https://github.com/user-attachments/assets/b8c98332-8be4-4791-850e-21aa27ceb886)
+
