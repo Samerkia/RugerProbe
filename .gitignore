@@ -33,3 +33,6 @@ frontend/yarn.lock
 
 # Ignore sln files 
 *.sln
+
+# Ignore secret file
+secrets.h
