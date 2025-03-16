@@ -3,12 +3,13 @@
 
 #include "Arduino.h"
 #include <DHT.h>           // Temperature & humidity sensor library
+#include <ArduinoBLE.h>
 
 // GPIO 1-6 will be LEDS for now
 #define LIGHT_SENSOR_LED_IND 2  // Light/Photoresistor indicator LED (ON = working, off = low light level, blink = error) - Red LED
 #define DHT_LED_IND 3           // Temp/Humid indicator LED (ON = working, blink/off = error) - Yellow LED
-#define ULTRA_SONIC_LED_IND 4           // Temp/Humid indicator LED (ON = working, blink/off = error) - BLUE LED
-#define MOTION_LED_IND 5           // Temp/Humid indicator LED (ON = working, blink/off = error) - GREEN LED
+#define ULTRA_SONIC_LED_IND 4           // Distance indicator LED (ON = working, blink/off = error) - BLUE LED
+#define MOTION_LED_IND 5           // Motion indicator LED (ON = working, blink/off = error) - GREEN LED
 
 // GPIO 7 - 13 are devices 
 #define DHTPIN 7                // DHT11 data pin
@@ -24,11 +25,16 @@
 // Analog Photoresistor pin
 const byte PHOTORESISTOR_PIN = A0; // Light reader pin
 
+BLEService dataService("180A");
+BLEStringCharacteristic stringCharacteristic("2A57", BLERead | BLEWrite, 256);
+
 // Initialize sensors
 DHT dht(DHTPIN, DHTTYPE);
 
 void setup() {
-  // put your setup code here, to run once:
+  Serial.begin(9600);
+  while(!Serial);
+  
   pinMode(PHOTORESISTOR_PIN, INPUT); // Analog
   pinMode(LIGHT_SENSOR_LED_IND, OUTPUT); // indicator output
   pinMode(DHT_LED_IND, OUTPUT); // indicator output
@@ -40,74 +46,66 @@ void setup() {
 
   pinMode(MOTION_SENSOR_PIN, INPUT); // Motion Sensor PIN
   
+  if (!BLE.begin()) {
+    Serial.println("b Error With Bluetooth");
+
+    while(1);
+  }
+
+  BLE.setLocalName("RugerProbe");
+  BLE.setAdvertisedService(dataService);
+  dataService.addCharacteristic(stringCharacteristic);
+  BLE.addService(dataService);
+  BLE.advertise();
+  Serial.println("BLE Peripheral Started - waiting for connection");
   dht.begin();
-  Serial.begin(9600);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  int lightLevel = analogRead(PHOTORESISTOR_PIN);//getLightLevels();  
-  validateLightSensor(lightLevel);
-  float temp, humidity;
-  getTempData(temp, humidity);
-  float dist = getSonar();
-  bool isMotion = monitorMotion();
-  printSensorData(temp, humidity, lightLevel, dist, isMotion);
-  delay(1);
+  BLEDevice central = BLE.central();  
+
+  if (central) {
+    while (central.connected()) {
+      Serial.println(central.address());
+      // put your main code here, to run repeatedly:
+      int lightLevel = analogRead(PHOTORESISTOR_PIN);//getLightLevels();  
+      validateLightSensor(lightLevel);
+      float temp, humidity;
+      getTempData(temp, humidity);
+      float dist = getSonar();
+      bool isMotion = monitorMotion();
+      printSensorData(temp, humidity, lightLevel, dist, isMotion);
+      if (central.connected()) {
+        sendDataViaBluetooth(temp, humidity, lightLevel, dist, isMotion);
+      }
+      delay(1000);
+    }
+  } else {
+    Serial.println("FAILURE PEICE OF SHIT");
+  }
 }
 
 bool monitorMotion() {
-  if (MOTION_LED_IND) digitalWrite(MOTION_LED_IND, HIGH);
-  else blinkError("MOTION");
-  if (digitalRead(MOTION_SENSOR_PIN) == HIGH) {
-    return true;
-  }
+  digitalWrite(MOTION_LED_IND, HIGH);
+  if (digitalRead(MOTION_SENSOR_PIN) == HIGH || digitalRead(MOTION_SENSOR_PIN) == LOW) {  
+    // If sensor responds with either HIGH or LOW, it's working.
+    return digitalRead(MOTION_SENSOR_PIN) == HIGH;
+  } 
+  blinkError("MOTION");
   return false;
 }
 
-unsigned long pulseIn(int pin, int level, int timeout) {
-  unsigned long startTime = micros();
-
-   // Wait for the pulse to START
-  while (digitalRead(pin) != level) {
-    if (micros() - startTime > timeout) {
-      // Serial.println("TIMEOUT waiting for pulse start");
-     blinkError("SONAR");
-      return 0; // Timeout
-    }
-  }
-
-  unsigned long pulseStart = micros();
-
-  // Wait for the pulse to END
-  while (digitalRead(pin) == level) {
-    if (micros() - startTime > timeout) {
-      // Serial.println("TIMEOUT waiting for pulse end");
-     blinkError("SONAR");
-      return 0; // Timeout
-    }
-  }
-
-  // Return the duration of the pulse in microseconds
-  return micros() - pulseStart;
-}
-
 float getSonar() {
-  
-  // Checks DHT11 module is working 
-  if (ULTRA_SONIC_LED_IND) digitalWrite(ULTRA_SONIC_LED_IND, HIGH);
-  else blinkError("DHT11");
-
   long pingTime;
   float dist;
   
   // Ensure the trigger pin is LOW before sending the pulse
   digitalWrite(SONIC_PIN, LOW); 
-  delayMicroseconds(2);
+  delay(1);
   
   // Trigger the ultrasonic sensor
   digitalWrite(SONIC_PIN, HIGH);
-  delayMicroseconds(10);  // Send a 10-microsecond pulse
+  delay(10);  // Send a 10-microsecond pulse
   digitalWrite(SONIC_PIN, LOW);
   
   // Measure the time it takes for the echo to return
@@ -124,17 +122,20 @@ float getSonar() {
   // Calculate the distance based on the speed of sound
   dist = (float)pingTime * 340.0 / 2.0 / 10000.0;  // Distance in cm
   
+  // Checks DHT11 module is working 
+  if (dist > 0 && dist < 400) digitalWrite(ULTRA_SONIC_LED_IND, HIGH);
+  else blinkError("DHT11");
+
   return dist;
 }
 
 
 void getTempData(float &temp, float &humidity) {
-  // Checks DHT11 module is working 
-  if (DHT_LED_IND) digitalWrite(DHT_LED_IND, HIGH);
-  else blinkError("DHT11");
-
-  // Read temperature and humidity
   temp = dht.readTemperature(); // Read temperature (Celsius)
+  // Checks DHT11 module is working 
+  if (!isnan(temp)) digitalWrite(DHT_LED_IND, HIGH);
+  else blinkError("DHT11");
+  // Read temperature and humidity
   temp = (temp * 9.0/5.0) + 32.0; // Temperature converted to fahrenheit 
   humidity = dht.readHumidity(); // Read humidity (%)
 }
@@ -163,11 +164,21 @@ void printSensorData(float t, float h, int l, float d, bool m) {
   }
 }
 
+void sendDataViaBluetooth(float t, float h, int l, float d, bool m) {
+  String data = String("t: ") + t + 
+                String(",h: ") + h + 
+                String(",l: ") + l + 
+                String(",d: ") + d + 
+                String(",m: ") + (m ? "MOTION DETECTED" : "Monitoring For Motion");
+
+  stringCharacteristic.writeValue(data);
+}
+
 void blinkError(String comp) {
   // Serial.println("ERROR " + comp);
   int pin;
   if (comp == "PHOTORESISTOR") pin = LIGHT_SENSOR_LED_IND;
-  else if (comp == "DHT11") pin = DHTPIN;
+  else if (comp == "DHT11") pin = DHT_LED_IND;
   else if (comp == "SONAR") pin = ULTRA_SONIC_LED_IND;
   else if (comp == "MOTION") pin = ULTRA_SONIC_LED_IND;
   else pin = 0;
