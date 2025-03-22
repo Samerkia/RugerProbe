@@ -4,6 +4,8 @@
 #include "Arduino.h"
 #include <DHT.h>           // Temperature & humidity sensor library
 #include <ArduinoBLE.h>
+#include <WiFiNINA.h>
+#include "secrets.h"
 
 // GPIO 1-6 will be LEDS for now
 #define LIGHT_SENSOR_LED_IND 2  // Light/Photoresistor indicator LED (ON = working, off = low light level, blink = error) - Red LED
@@ -25,8 +27,12 @@
 // Analog Photoresistor pin
 const byte PHOTORESISTOR_PIN = A0; // Light reader pin
 
-BLEService dataService("180A");
-BLEStringCharacteristic stringCharacteristic("2A57", BLERead | BLEWrite, 256);
+char ssid[] = WIFI_SSID;
+char pass[] = WIFI_PASSWORD;
+int status = WL_IDLE_STATUS;
+WiFiServer server(6969);
+// BLEService dataService("180A");
+// BLEStringCharacteristic stringCharacteristic("2A57", BLERead | BLEWrite, 256);
 
 // Initialize sensors
 DHT dht(DHTPIN, DHTTYPE);
@@ -46,27 +52,46 @@ void setup() {
 
   pinMode(MOTION_SENSOR_PIN, INPUT); // Motion Sensor PIN
   
-  if (!BLE.begin()) {
-    Serial.println("b Error With Bluetooth");
+  while (status != WL_CONNECTED) {
+    Serial.print("Attempting to connect to network: ");
+    Serial.println(ssid);
+    // Connect to WPA/WPA2 network:
+    status = WiFi.begin(ssid, pass);
 
-    while(1);
+    // wait 10 seconds for connection:
+    delay(10000);
   }
 
-  BLE.setLocalName("RugerProbe");
-  BLE.setAdvertisedService(dataService);
-  dataService.addCharacteristic(stringCharacteristic);
-  BLE.addService(dataService);
-  BLE.advertise();
-  Serial.println("BLE Peripheral Started - waiting for connection");
+  // if (!BLE.begin()) {
+  //   Serial.println("b Error With Bluetooth");
+
+  //   while(1);
+  // }
+
+  // BLE.setLocalName("RugerProbe");
+  // BLE.setAdvertisedService(dataService);
+  // dataService.addCharacteristic(stringCharacteristic);
+  // BLE.addService(dataService);
+  // BLE.advertise();
+  // Serial.println("BLE Peripheral Started - waiting for connection");
+
   dht.begin();
+  server.begin();
+  // you're connected now, so print out the data:
+  Serial.println("You're connected to the network");
+  Serial.println("---------------------------------------");
+
 }
-
+int i = 0;
 void loop() {
-  BLEDevice central = BLE.central();  
-
-  if (central) {
-    while (central.connected()) {
-      Serial.println(central.address());
+  // BLEDevice central = BLE.central();  
+  WiFiClient client = server.available();
+  // if (central) {
+  if (client) {
+    Serial.println("New client connected BRUH");
+    //while (central.connected()) {
+    while (client.connected()) {
+      // Serial.println(central.address());
       // put your main code here, to run repeatedly:
       int lightLevel = analogRead(PHOTORESISTOR_PIN);//getLightLevels();  
       validateLightSensor(lightLevel);
@@ -74,14 +99,26 @@ void loop() {
       getTempData(temp, humidity);
       float dist = getSonar();
       bool isMotion = monitorMotion();
-      printSensorData(temp, humidity, lightLevel, dist, isMotion);
-      if (central.connected()) {
-        sendDataViaBluetooth(temp, humidity, lightLevel, dist, isMotion);
-      }
+      // if (central.connected()) {
+      //   sendDataViaBluetooth(temp, humidity, lightLevel, dist, isMotion);
+      // }
+      
+      client.print("HTTP/1.1 200 OK\r\n");
+      client.print("Content-Type: text/plain\r\n");
+      client.print("Connection: close\r\n\r\n");
+
+      // client.print(data + String(i));
+      printSensorData(temp, humidity, lightLevel, dist, isMotion, client);
+
       delay(1000);
+      // delay(1);
+      client.stop();
+      Serial.println("Client disconnected");
+      // }
+      // } else {
+      //   Serial.println("FAILURE PEICE OF SHIT");
+      // }
     }
-  } else {
-    Serial.println("FAILURE PEICE OF SHIT");
   }
 }
 
@@ -151,16 +188,22 @@ void validateLightSensor(int l) {
     }
 }
 
-void printSensorData(float t, float h, int l, float d, bool m) {
+void printSensorData(float t, float h, int l, float d, bool m, WiFiClient c) {
   // Print sensor values
   Serial.print("t "); Serial.print(t); Serial.println(" F");
+  c.print("t "); c.print(t); c.println(" F");
   Serial.print("h "); Serial.print(h); Serial.println(" %");
+  c.print("h "); c.print(h); c.println(" %");
   Serial.print("l "); Serial.print(l); Serial.println(" lux");
+  c.print("l "); c.print(l); c.println(" lux");
   Serial.print("d "); Serial.print(d); Serial.println(" cm away from object");
+  c.print("d "); c.print(d); c.println(" cm away from object");
   if (m) {
     Serial.print("m "); Serial.println("MOTION DETECTED");
+    c.print("m "); c.println("MOTION DETECTED");
   } else {
     Serial.print("m "); Serial.println("Monitoring For Motion");
+    c.print("m "); c.println("Monitoring For Motion");
   }
 }
 
@@ -171,7 +214,7 @@ void sendDataViaBluetooth(float t, float h, int l, float d, bool m) {
                 String(",d: ") + d + 
                 String(",m: ") + (m ? "MOTION DETECTED" : "Monitoring For Motion");
 
-  stringCharacteristic.writeValue(data);
+  // stringCharacteristic.writeValue(data);
 }
 
 void blinkError(String comp) {
