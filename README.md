@@ -2,7 +2,7 @@
 This is a probe device named after my dog, Ruger. It will read telemetry data and transmit it to a front end app with eventual wireless communication!
 
 Current component list
-- Arduino Uno (in the prototype phase, if built may use Arduino Nano 33)
+- ~~Arduino Uno (in the prototype phase, if built may use Arduino Nano 33)~~ Arduino Nano IOT 33
 - temperature and humidity levels (DHT11) 
 - light levels (photoresistor [Might switch to TSL2562])
 - PIR Motion Sensor
@@ -11,7 +11,7 @@ Current component list
 ## Future updates
 Hardware
 - Implement a way to take pictures
-- Switch to Arduino Nano 33 then I can transmit data wirelessly
+- [x] ~~Switch to Arduino Nano 33 then I can transmit data wirelessly~~ DONE! 3/22/24
 - Design a custom PCB to use instead of a bread board
 - Implement a way to add in motors and wheels
 - If I add in motors and wheels, I will need to add in a way to read acceleration and a gyroscope (Attitude Sensor MPU6050)
@@ -23,11 +23,11 @@ Code
 
 # Running the app
 - Have the Arduino run the main.ino code
-- Run the backend code `dotnet run .\serialDataHandler.cs`
+- Run the backend code `dotnet run`
 - Run the frontend code `npx electron .`
 - Eventually I will make it into one executable
 
-# Current Status <3/22/25>
+# Current Status/Updates <3/22/25>
 ## Code updates
 I can now send and receive data via wifi! I did wifi instead of Bluetooth cuz I couldn't get BT to work and wifi has bigger range anyways.
 ## Data Collection Screens
