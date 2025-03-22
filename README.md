@@ -27,7 +27,9 @@ Code
 - Run the frontend code `npx electron .`
 - Eventually I will make it into one executable
 
-# Current Status <3/2/25>
+# Current Status <3/22/25>
+## Code updates
+I can now send and receive data via wifi! I did wifi instead of Bluetooth cuz I couldn't get BT to work and wifi has bigger range anyways.
 ## Data Collection Screens
 3/2/25 - Displays all data collected (Temperature, Humidity, Light Level, Distance an object is, and if Motion is detected or not), and it is now stylized! (I will keep updating as I see fit as well)
 
